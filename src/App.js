@@ -1,23 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Tesseract from "tesseract.js";
+import Dropzone from "react-dropzone";
 
 function App() {
+  const [text, setText] = useState("");
+
+  const handleDrop = (acceptedFiles) => {
+    const image = acceptedFiles[0];
+    Tesseract.recognize(image, "eng", { logger: (m) => console.log(m) })
+      .then(({ data: { text } }) => setText(text))
+      .catch((err) => console.error(err));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Dropzone onDrop={handleDrop}>
+        {({ getRootProps, getInputProps }) => (
+          <div {...getRootProps()}>
+            <input {...getInputProps()} />
+            <p>Drop an image here, or click to select an image</p>
+          </div>
+        )}
+      </Dropzone>
+      <p>{text}</p>
     </div>
   );
 }
